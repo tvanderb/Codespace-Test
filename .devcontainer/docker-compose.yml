@@ -1,0 +1,35 @@
+version: '3.8'
+
+volumes:
+  postgres-data:
+
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: devcontainer.dockerfile
+    env_file:
+        - .env
+
+    volumes:
+      - ../..:/workspaces:cached
+    command: sleep infinity
+    network_mode: service:db
+
+  db:
+    build:
+      context: ..
+      dockerfile: .devcontainer/database.dockerfile
+    restart: unless-stopped
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    env_file:
+        - .env
+    network_mode: host
+  
+  cache:
+    build:
+      context: .
+      dockerfile: ./cache.dockerfile
+    restart: unless-stopped
+    network_mode: host
